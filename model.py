@@ -146,8 +146,8 @@ if __name__ == "__main__":
     CSV_records = []
     with open('data/driving_log.csv', 'r') as csvfile:
         reader_obj = csv.reader(csvfile)
-    for row in reader_obj:
-        CSV_records.append(row)
+           for row in reader_obj:
+               CSV_records.append(row)
     print("Read driving log completed")
     # spliting training and validation data
     training_data1, validation_data1 = train_test_split(CSV_records[1:], test_size=0.2)
