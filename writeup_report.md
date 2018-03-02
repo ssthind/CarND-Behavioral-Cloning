@@ -8,8 +8,8 @@
 
 **Behavioral Cloning Project**
 
-The goals / steps of this project are the following:
-* Use the simulator to collect data of good driving behavior
+The steps followed in this project were :
+* Used the udacity provided data
 * Build, a convolution neural network in Keras that predicts steering angles from images
 * Train and validate the model with a training and validation set
 * Test that the model successfully drives around track one without leaving the road
@@ -19,12 +19,11 @@ The goals / steps of this project are the following:
 [//]: # (Image References)
 
 [image1]: ./examples/placeholder.png "Model Visualization"
-[image2]: ./examples/placeholder.png "Grayscaling"
-[image3]: ./examples/placeholder_small.png "Recovery Image"
-[image4]: ./examples/placeholder_small.png "Recovery Image"
-[image5]: ./examples/placeholder_small.png "Recovery Image"
-[image6]: ./examples/placeholder_small.png "Normal Image"
-[image7]: ./examples/placeholder_small.png "Flipped Image"
+
+[video1]: ./input_data/center_imgs.mp4 "Input Data from Center camera video"
+[video2]: ./input_data/left_imgs.mp4 "Input Data from Left camera video"
+[video3]: ./input_data/right_imgs.mp4 "Input Data from Right camera video"
+
 
 ## Rubric Points
 ### Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
@@ -38,12 +37,12 @@ My project includes the following files:
 * model.py containing the script to create and train the model
 * drive.py for driving the car in autonomous mode
 * model.h5 containing a trained convolution neural network 
-* writeup_report.md or writeup_report.pdf summarizing the results
+* writeup_report.md summarizing the results
 
 #### 2. Submission includes functional code
 Using the Udacity provided simulator and my drive.py file, the car can be driven autonomously around the track by executing 
 ```sh
-python drive.py model.h5 run_xx_folder
+python drive.py model.h5 run_best_model_folder
 ```
 
 #### 3. Submission code is usable and readable
@@ -54,23 +53,39 @@ The model.py file contains the code for training and saving the convolution neur
 
 #### 1. An appropriate model architecture has been employed
 
-My model consists of a convolution neural network with 3x3 filter sizes and depths between 32 and 128 (model.py lines 18-24) 
-
-The model includes RELU layers to introduce nonlinearity (code line 20), and the data is normalized in the model using a Keras lambda layer (code line 18). 
+Model is defined using Keras library(tensorflow backend) in function "model_architecture" consists of a initial cropping the image to extract the Region of interest (ROI). Then the data is normalized in the model using a Keras lambda layer. Next convolution neural network layers with 5x5, 3x3 filter sizes and depths/'no. of filters' as 5, 24, 32, 48, 64. Followed by Flattening and fully connected layers. 
+The model includes RELU layers to introduce nonlinearity after every layer and stride 2 in convolution layer for compacting the information passed to the next layer.
+The ELU activation and MAX pooling was also tried, but it appeared that RELU layers with strides in convolution layer performs better.
 
 #### 2. Attempts to reduce overfitting in the model
 
-The model contains dropout layers in order to reduce overfitting (model.py lines 21). 
+The model contains dropout layers in order to reduce overfitting after mutiple convolution and Fully connected layer. 
 
-The model was trained and validated on different data sets to ensure that the model was not overfitting (code line 10-16). The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
+The model was trained and validated on different data sets to ensure that the model was not overfitting. The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
+
+
+38400/38568 [============================>.] - ETA: 0s - loss: 0.0228 - acc: 0.1814
+Epoch 00000: val_acc improved from -inf to 0.17931, saving model to model_chkpt.h5
+38568/38568 [==============================] - 99s - loss: 0.0229 - acc: 0.1813 - val_loss: 0.0183 - val_acc: 0.1793
+Epoch 2/3
+38400/38568 [============================>.] - ETA: 0s - loss: 0.0183 - acc: 0.1813
+Epoch 00001: val_acc did not improve
+38568/38568 [==============================] - 53s - loss: 0.0183 - acc: 0.1813 - val_loss: 0.0172 - val_acc: 0.1793
+Epoch 3/3
+38400/38568 [============================>.] - ETA: 0s - loss: 0.0172 - acc: 0.1813
+Epoch 00002: val_acc did not improve
+38568/38568 [==============================] - 53s - loss: 0.0172 - acc: 0.1813 - val_loss: 0.0165 - val_acc: 0.1793
+
 
 #### 3. Model parameter tuning
 
-The model used an adam optimizer, so the learning rate was not tuned manually (model.py line 25).
+The model used an adam optimizer, so the learning rate was not tuned manually.
+Batch used was 32, with generating mutiply by factor of 6, resulting in 32 X 6 = 192 images
+Dropout of 0.4 and 0.3 have been used.
 
 #### 4. Appropriate training data
 
-Training data was chosen to keep the vehicle driving on the road. I used a combination of center lane driving, recovering from the left and right sides of the road ... 
+Training data used with the [udacity data](https://s3.amazonaws.com/video.udacity-data.com/topher/2016/December/584f6edd_data/data.zip)
 
 For details about how I created the training data, see the next section. 
 
@@ -78,19 +93,17 @@ For details about how I created the training data, see the next section.
 
 #### 1. Solution Design Approach
 
-The overall strategy for deriving a model architecture was to ...
+The overall strategy for deriving a model architecture was to try various models on the existing data set.
 
-My first step was to use a convolution neural network model similar to the ... I thought this model might be appropriate because ...
+My first step was to use simple single layer convolution neural network model. Then next model tested was Similar to [Nvidia architecture](http://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf). I thought a similar model to this might be appropriate because it, was used for the similar task. 
 
 In order to gauge how well the model was working, I split my image and steering angle data into a training and validation set. I found that my first model had a low mean squared error on the training set but a high mean squared error on the validation set. This implied that the model was overfitting. 
 
-To combat the overfitting, I modified the model so that ...
+To combat the overfitting, I modified the model by adding drop out layers after convolutions layer 2, 3, 4 and after first dense/fully connected layer. and to reduce the number of parameter MAX Pooling layer were added to convolutions layers(with ELU activation) 2,3,4,
 
-Then I ... 
+The final step was to run the simulator to see how well the car was driving around track one. There were a few spots where the vehicle more very closer to lane in certains turns. So to improve the driving behavior in these cases, I tried experimenting the the RELU activation(instead of ELU) and with Stride(subsample) of 2 in convolution layer instead of MAX pooling. Which improved the model further making the car move more in center compared to earlier models tried.
 
-The final step was to run the simulator to see how well the car was driving around track one. There were a few spots where the vehicle fell off the track... to improve the driving behavior in these cases, I ....
-
-At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road.
+At the end of the process, the vehicle is able to drive autonomously around the track much better on the road.
 
 #### 2. Final Model Architecture
 
@@ -148,37 +161,30 @@ ________________________________________________________________________________
 activation_8 (Activation)        (None, 10)            0           dense_3[0][0]
 ____________________________________________________________________________________________________
 dense_4 (Dense)                  (None, 1)             11          activation_8[0][0]
-====================================================================================================
+===================================================
 Total params: 283,871
 Trainable params: 283,871
 Non-trainable params: 0
 ____________________________________________________________________________________________________
-![alt text][image1]
+
+
 
 #### 3. Creation of the Training Set & Training Process
 
-To capture good driving behavior, I first recorded two laps on track one using center lane driving. Here is an example image of center lane driving:
+Udacity data set was used for training, which consist 5 laps in one direction and 4 laps in opposite direction for 3 cameras: center, left, right.
+Center camera data video: ![alt text][video1]
 
-![alt text][image2]
+For vehicle recovering from the left side and right sides of the road back to center I used the left and right camera image with stiring correction.
 
-I then recorded the vehicle recovering from the left side and right sides of the road back to center so that the vehicle would learn to .... These images show what a recovery looks like starting from ... :
+For the image from left camera a stiring angle was calculate by adding correction of 0.2 to stiring angle for center image.
+![alt text][video2]
 
-![alt text][image3]
-![alt text][image4]
-![alt text][image5]
-
-Then I repeated this process on track two in order to get more data points.
-
-To augment the data sat, I also flipped images and angles thinking that this would ... For example, here is an image that has then been flipped:
-
-![alt text][image6]
-![alt text][image7]
-
-Etc ....
-
-After the collection process, I had X number of data points. I then preprocessed this data by ...
+For the image from right camera a stiring angle was calculate by adding correction of -0.2 to stiring angle for center image.
+![alt text][video3]
 
 
-I finally randomly shuffled the data set and put Y% of the data into a validation set. 
+To augment the data set, I also flipped images using the numpy function `np.flip(img_XXXX,1)`(lines 121 to 123) and negated the stiring angles (lines 125 to 127)
 
-I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was Z as evidenced by ... I used an adam optimizer so that manually training the learning rate wasn't necessary.
+The process of fetching the data for file was done using function `process_image` , which was called from `generator` function. `generator` function was further used to feed the data to the model by randomly shuffling the for each of data sets(training and validation set) for epoch. During training and validation in function call `model.fit_generator`. Total of 8035*5 = 48210 number of data points where generated and split in 80:20 ratio for training(38568) and validation for each Epoch. 
+
+I used this training data for training the model. The validation set helped determine if the model was over or under fitting. I used an adam optimizer so that manually training the learning rate wasn't necessary. Further keras callbacks functions ensured the best model was saved

@@ -146,12 +146,12 @@ if __name__ == "__main__":
     CSV_records = []
     with open('data/driving_log.csv', 'r') as csvfile:
         reader_obj = csv.reader(csvfile)
-        for row in reader_obj:
-            CSV_records.append(row)
+    for row in reader_obj:
+        CSV_records.append(row)
     print("Read driving log completed")
     # spliting training and validation data
     training_data1, validation_data1 = train_test_split(CSV_records[1:], test_size=0.2)
-    print("Split Records")
+    print("Data Records Split")
     # calling generator function for training and validation data generation    
     train_generator = generator(training_data1, batch_size=32)
     validation_generator = generator(validation_data1, batch_size=32)
@@ -159,15 +159,16 @@ if __name__ == "__main__":
     ## creating keras model
     model = model_architecture()
     print("Model architecture created")
+    
     ## Setting up callbacks
     filename = "model_chkpt.h5"
     checkpoint = keras.callbacks.ModelCheckpoint(filename, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
     # EarlyStopping callback
     early_stop = keras.callbacks.EarlyStopping(monitor='val_acc', patience=1, mode='max') 
-	# tensorboard callback
-	# tensorboard_callback = TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=False)
-	# callbacks_list = [checkpoint, early_stop, tensorboard_callback]
-	callbacks_list = [checkpoint, early_stop]
+    # tensorboard callback
+    # tensorboard_callback = TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=False)
+    # callbacks_list = [checkpoint, early_stop, tensorboard_callback]
+    callbacks_list = [checkpoint, early_stop]
     
     # compile and train the model using the generator function
     # Calling Compile function on keras model for setting up loss, optimizer and metrics
