@@ -172,15 +172,15 @@ ________________________________________________________________________________
 #### 3. Creation of the Training Set & Training Process
 
 Udacity data set was used for training, which consist 5 laps in one direction and 4 laps in opposite direction for 3 cameras: center, left, right.
-Center camera data video: ![alt text][video1]
+Center camera data video: ![Data set from Center camera video][video1]
 
 For vehicle recovering from the left side and right sides of the road back to center I used the left and right camera image with stiring correction.
 
 For the image from left camera a stiring angle was calculate by adding correction of 0.2 to stiring angle for center image.
-![alt text][video2]
+![Data set from Left camera video][video2]
 
 For the image from right camera a stiring angle was calculate by adding correction of -0.2 to stiring angle for center image.
-![alt text][video3]
+![Data set from Right camera video][video3]
 
 
 To augment the data set, I also flipped images using the numpy function `np.flip(img_XXXX,1)`(lines 121 to 123) and negated the stiring angles (lines 125 to 127)
